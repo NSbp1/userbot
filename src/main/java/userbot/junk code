@@ -1,0 +1,14 @@
+
+        //String message = json.optString("message", "");
+       // String phoneNumber = json.optString("phone", "");
+        // String name = json.optString("name", "");
+        // String email = json.optString("email", "");
+
+        String responseMessage;
+
+            responseMessage = bot.registerUser(body,session);
+       /* } else if (!message.isEmpty() && !phoneNumber.isEmpty()) {
+            responseMessage = bot.handleUserMessage(message, phoneNumber);
+        } else {
+            responseMessage = "Invalid request data.";
+        }*/
