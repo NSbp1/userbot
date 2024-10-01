@@ -1,4 +1,4 @@
-package userbot;
+package userbot.models;
 
 public class User {
     private String name;
