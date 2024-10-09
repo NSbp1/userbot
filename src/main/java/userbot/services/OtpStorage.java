@@ -13,13 +13,6 @@ import java.util.Random;
 @Service
 public class OtpStorage {
 
-    // Generate and store OTP in the database
-    public String generateAndStoreOtp(String phoneNumber) {
-        String otp = generateOtp();
-        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5); // OTP expires in 5 minutes
-        storeOtp(phoneNumber, otp, expirationTime);
-        return otp;
-    }
 
     // Store OTP in the database
     void storeOtp(String phoneNumber, String otp, LocalDateTime expirationTime) {

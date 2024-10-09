@@ -12,15 +12,13 @@ public class UserSession {
     private Integer id;
 
     // Default constructor (no arguments)
-  /*  public UserSession() {
-    } */
+    public UserSession() {
+    }
 
     // Constructor that accepts phone number
-    /*public UserSession(String phoneNumber) {
+   /* public UserSession(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
-*/
-
 
     // Constructor with all parameters
     public UserSession(Integer id, String phoneNumber, String stage) {
@@ -28,7 +26,8 @@ public class UserSession {
         this.phoneNumber = phoneNumber;
         this.stage = stage;
 
-    }
+    } */
+
 
 
 }

@@ -89,6 +89,7 @@ public class UserRegistrationStageHandler {
             User newUser = new User(fullName, userSession.getEmail(), userSession.getPhoneNumber());
             userService.createUser(newUser);
             userSessionService.deleteUserSession(userSession.getId());
+            otpStorage.removeOtp(userSession.getPhoneNumber());
             return "Registration successful! Welcome, " + userSession.getName() + "!";
         }
 
