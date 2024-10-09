@@ -2,41 +2,58 @@ package userbot.services;
 
 import org.json.JSONObject;
 import userbot.models.UserSession;
-import java.sql.SQLException;
 import userbot.models.User;
+import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.Random;
+
+@Service
 public class UserRegistrationStageHandler {
 
-    private final UserSessionService userSessionService; // Declare UserSessionService
-    private final UserService userService; // Declare UserService
+    private final UserSessionService userSessionService;
+    private final UserService userService;
+    private final OtpStorage otpStorage;
 
-    // Constructor to inject UserSessionService and UserService
-    public UserRegistrationStageHandler(UserSessionService userSessionService, UserService userService) {
+    public UserRegistrationStageHandler(UserSessionService userSessionService, UserService userService, OtpStorage otpStorage) {
         this.userSessionService = userSessionService;
-        this.userService = userService; // Initialize userService
+        this.userService = userService;
+        this.otpStorage = otpStorage;
     }
 
+    // Handle greeting stage and generate OTP
     public String handleGreetStage(UserSession userSession) {
-        userSession.setStage("name");
-        return "Hello, let's register you! What is your name?";
+        String otp = generateOtp();
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5); // OTP valid for 5 minutes
+        otpStorage.storeOtp(userSession.getPhoneNumber(), otp, expirationTime);
+        userSession.setStage("otp");
+        System.out.println("Generated OTP: " + otp); // In practice, send via SMS or email
+        return "An OTP has been generated and printed to the console. Please enter it to continue.";
     }
 
+    // Handle OTP stage
+    public String handleOtpStage(UserSession userSession, JSONObject json) {
+        String enteredOtp = json.optString("message", "").trim();
+        if (otpStorage.verifyOtp(userSession.getPhoneNumber(), enteredOtp)) {
+            userSession.setStage("name");
+            return "OTP verified! What is your name?";
+        }
+        return "Invalid OTP or OTP has expired. Please try again.";
+    }
+
+    // Handle Name stage
     public String handleNameStage(UserSession userSession, JSONObject json) {
         String name = json.optString("message", "").trim();
         if (name.isEmpty()) {
             return "Please provide a valid name.";
         }
         userSession.setName(name);
-        try {
-            userSessionService.updateUserSession(userSession);  // Use userSessionService injected via constructor
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "An error occurred while updating the session. Please try again.";
-        }
         userSession.setStage("surname");
         return "Okay " + name + ", what is your surname?";
     }
 
+    // Handle Surname stage
     public String handleSurnameStage(UserSession userSession, JSONObject json) {
         String surname = json.optString("message", "").trim();
         if (surname.isEmpty()) {
@@ -47,6 +64,7 @@ public class UserRegistrationStageHandler {
         return "Great! Now, what is your email address, " + userSession.getName() + "?";
     }
 
+    // Handle Email stage
     public String handleEmailStage(UserSession userSession, JSONObject json) {
         String email = json.optString("message", "").trim();
         if (!isValidEmail(email)) {
@@ -59,29 +77,32 @@ public class UserRegistrationStageHandler {
                 "3. Email: " + email + "\nType 'Yes' or 'No'.";
     }
 
+    // Handle Decision stage
     public String handleDecisionStage(UserSession userSession, JSONObject json) throws SQLException {
         String decision = json.optString("message", "").trim();
+
         if (decision.equalsIgnoreCase("no")) {
             userSession.setStage("name");
             return "Enter your name.";
         } else if (decision.equalsIgnoreCase("yes")) {
-            try {
-                // Begin transaction or use proper transactional management
-                String fullName = userSession.getName() + " " + userSession.getSurname();
-                userService.createUser(new User(fullName, userSession.getEmail(), userSession.getPhoneNumber()));
-                userSessionService.deleteUserSession(userSession.getId());
-                return "Registration successful! Welcome, " + userSession.getName() + "!";
-            } catch (SQLException e) {
-                // In case of an error, do not delete the session
-                e.printStackTrace(); // Optional: Print the stack trace for debugging
-                return "There was an error while registering. Please try again later.";
-            }
+            String fullName = userSession.getName() + " " + userSession.getSurname();
+            User newUser = new User(fullName, userSession.getEmail(), userSession.getPhoneNumber());
+            userService.createUser(newUser);
+            userSessionService.deleteUserSession(userSession.getId());
+            return "Registration successful! Welcome, " + userSession.getName() + "!";
         }
+
         return "Please confirm with 'Yes' or 'No'.";
     }
 
+    // Utility functions
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
         return email.matches(emailRegex);
+    }
+
+    private String generateOtp() {
+        int otp = new Random().nextInt(999999);
+        return String.format("%06d", otp);
     }
 }

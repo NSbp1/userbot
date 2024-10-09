@@ -9,27 +9,26 @@ public class UserSession {
     private String surname;
     private String email;
     private String stage;
-    private String sessionData;
-    private Long id;
+    private Integer id;
 
     // Default constructor (no arguments)
-    public UserSession() {
-    }
+  /*  public UserSession() {
+    } */
 
     // Constructor that accepts phone number
-    public UserSession(String phoneNumber) {
+    /*public UserSession(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+*/
+
 
     // Constructor with all parameters
-    public UserSession(Long id, String phoneNumber, String stage, String sessionData) {
+    public UserSession(Integer id, String phoneNumber, String stage) {
         this.id = id;
         this.phoneNumber = phoneNumber;
         this.stage = stage;
-        this.sessionData = sessionData;
+
     }
 
-    public void setStage(String stage) {
-        this.stage = stage;
-    }
+
 }

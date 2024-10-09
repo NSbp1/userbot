@@ -1,4 +1,4 @@
-package userbot.services;
+/*package userbot.services;
 
 import java.util.UUID;
 import lombok.Data;
@@ -20,3 +20,4 @@ public class ServiceRequest {
     }
 
 }
+*/
