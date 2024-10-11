@@ -3,7 +3,7 @@ package userbot.services;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import userbot.models.UserSession;
-import userbot.services.OtpStorage;
+
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -48,6 +48,7 @@ public class UserRegistrationService {
             }
         });
     }
+
 
     public String registerUser(JSONObject json) throws SQLException {
         String phoneNumber = json.optString("phone", "");

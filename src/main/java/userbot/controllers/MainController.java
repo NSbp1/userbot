@@ -3,8 +3,6 @@ package userbot.controllers;
 import org.springframework.web.bind.annotation.*;
 import org.json.JSONObject;
 import userbot.models.User;
-import userbot.models.UserSession;
-import userbot.services.UserSessionService;
 import userbot.services.UserRegistrationService;
 import userbot.services.UserService;
 
@@ -16,13 +14,11 @@ public class MainController {
 
     private final UserService userService;
     private final UserRegistrationService registrationService;
-    private final UserSessionService userSessionService;
 
     // Constructor to initialize services
-    public MainController(UserService userService, UserRegistrationService registrationService, UserSessionService userSessionService) {
+    public MainController(UserService userService, UserRegistrationService registrationService) {
         this.userService = userService;
         this.registrationService = registrationService;
-        this.userSessionService = userSessionService;
     }
 
     @PostMapping
